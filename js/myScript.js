@@ -340,11 +340,9 @@ let config = {
       gravity: {
         y: 400
       },
-      debug: true
+      debug: false
     }
   },
-  // debug
-  //scene: [Title, Main, GameOver, GameClear]
-  scene: [Main, GameOver, GameClear]
+  scene: [Title, Main, GameOver, GameClear]
 };
 let fane = new Phaser.Game(config);
