@@ -11,9 +11,15 @@ class Main extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 200
     });
-    this.load.image('littleangel', 'asset/characters/littleangel.png');
-    this.load.image('block', 'asset/bg/block.png');
-    this.load.image('demon', 'asset/characters/demon.png');
+    this.load.spritesheet('demon', 'asset/characters/demonspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.spritesheet('littleangel', 'asset/characters/littleangelspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.image('cloud', 'asset/bg/cloud.png');
     this.load.image('goal', 'asset/bg/goal.png');
     this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
     this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
@@ -44,62 +50,25 @@ class Main extends Phaser.Scene {
       this.backgroundMusic.stop();
       this.scene.start('GameClear');
     }
-    // BGM
-    this.backgroundMusic = this.sound.add('stageBGM');
-    let loopMaker = {
-      name: 'loop',
-      start: 0,
-      duration: 34,
-      config: {
-        loop: true
-      }
-    };
-    this.backgroundMusic.addMarker(loopMaker);
-    this.backgroundMusic.play('loop', {
-      delay: 0
+    // animation
+    this.anims.create({
+      key: 'littleangelIdle',
+      frames: this.anims.generateFrameNumbers('littleangel', {
+        start: 0,
+        end: 1
+      }),
+      frameRate: 2,
+      repeat: -1
     });
-    // 背景
-    this.add.image(width/2, height/2, 'bgLayer1').setScrollFactor(0);
-    this.add.image(width/2, height/2, 'bgLayer2').setScrollFactor(0.1);
-    this.add.image(width/2, height/2, 'bgLayer3').setScrollFactor(0.2);
-    // 地面
-    this.ground = this.physics.add.staticSprite(width/2, stageHeight-32, 'ground');
-    this.ground.setSize(width, 50, 1, 1);
-    // 雲
-    this.clouds = this.physics.add.staticGroup();
-    this.clouds.create(300, stageHeight-2250, 'block');
-    this.clouds.create(800, stageHeight-2000, 'block');
-    this.clouds.create(50, stageHeight-1850, 'block');
-    this.clouds.create(300, stageHeight-1550, 'block');
-    this.clouds.create(800, stageHeight-1350, 'block');
-    this.clouds.create(50, stageHeight-1050, 'block');
-    this.clouds.create(500, stageHeight-950, 'block');
-    this.clouds.create(50, stageHeight-650, 'block');
-    this.clouds.create(800, stageHeight-550, 'block');
-    this.clouds.create(300, stageHeight-250, 'block');
-    this.clouds.create(0, stageHeight-0, 'block');
-    this.clouds.children.entries.forEach(block=>{
-      block.body.setSize(200, 150, 1, 1);
+    this.anims.create({
+      key: 'demonIdle',
+      frames: this.anims.generateFrameNumbers('demon', {
+        start: 0,
+        end: 1
+      }),
+      frameRate: 2,
+      repeat: -1
     });
-    // スコア
-    this.score = new Number();
-    this.scoreText = this.add.text(16, 16, 'score:'+Number(0), {
-      fontSize: '64px',
-      fill: '#ffe663'
-    }).setScrollFactor(0);
-    // ゴール
-    // TODO: ゴール素材差し替え
-    // debug
-    //this.goal = this.physics.add.staticSprite(700, stageHeight-1500, 'goal');
-    // プレイヤー
-    // TODO: プレイヤーをspriteアニメーションで動くように, 当たり判定をいい感じにする
-    //this.player = this.physics.add.sprite(400, height-1200, 'player');
-    // debug
-    //this.player = this.physics.add.sprite(300, stageHeight-1750, 'player');
-    this.player = this.physics.add.sprite(400, stageHeight-200, 'player');
-    this.player.setSize(80, 170, 1, 1);
-    this.player.setBounce(0.2);
-    this.player.setCollideWorldBounds(true);
     this.anims.create({
       key: 'left',
       frames: this.anims.generateFrameNumbers('player', {
@@ -127,6 +96,64 @@ class Main extends Phaser.Scene {
       frameRate: 2,
       repeat: -1
     });
+    // BGM
+    this.backgroundMusic = this.sound.add('stageBGM');
+    let loopMaker = {
+      name: 'loop',
+      start: 0,
+      duration: 34,
+      config: {
+        loop: true
+      }
+    };
+    this.backgroundMusic.addMarker(loopMaker);
+    this.backgroundMusic.play('loop', {
+      delay: 0
+    });
+    // 背景
+    this.add.image(width/2, height/2, 'bgLayer1').setScrollFactor(0);
+    this.add.image(width/2, height/2, 'bgLayer2').setScrollFactor(0.15);
+    this.add.image(width/2, height/2, 'bgLayer3').setScrollFactor(0.2);
+    // 地面
+    this.ground = this.physics.add.staticSprite(width/2, stageHeight-32, 'ground');
+    this.ground.setSize(width, 50, 1, 1);
+    // 雲
+    this.clouds = this.physics.add.staticGroup();
+    this.clouds.create(50, stageHeight-2850, 'cloud');
+    this.clouds.create(800, stageHeight-2550, 'cloud');
+    this.clouds.create(300, stageHeight-2250, 'cloud');
+    this.clouds.create(800, stageHeight-2000, 'cloud');
+    this.clouds.create(50, stageHeight-1850, 'cloud');
+    this.clouds.create(300, stageHeight-1550, 'cloud');
+    this.clouds.create(800, stageHeight-1350, 'cloud');
+    this.clouds.create(50, stageHeight-1050, 'cloud');
+    this.clouds.create(500, stageHeight-950, 'cloud');
+    this.clouds.create(50, stageHeight-650, 'cloud');
+    this.clouds.create(800, stageHeight-550, 'cloud');
+    this.clouds.create(300, stageHeight-250, 'cloud');
+    this.clouds.children.entries.forEach(block=>{
+      block.body.setSize(200, 150, 1, 1);
+    });
+    // スコア
+    this.score = new Number();
+    /*
+    font-family: 'DotGothic16', sans-serif;
+    */
+    this.scoreText = this.add.text(16, 16, 'score:'+Number(0), {
+      fontSize: '64px',
+      fill: '#ff99e7',
+      fontFamily: 'DotGothic16'
+    }).setScrollFactor(0);
+    // ゴール
+    this.goal = this.physics.add.staticSprite(780, stageHeight-1450, 'goal');
+    this.goal.setSize(150, 150, 1, 1);
+    // プレイヤー
+    this.player = this.physics.add.sprite(600, stageHeight-200, 'player');
+    // debug
+    //this.player = this.physics.add.sprite(300, stageHeight-2500, 'player');
+    this.player.setSize(80, 170, 1, 1);
+    this.player.setBounce(0.2);
+    this.player.setCollideWorldBounds(true);
     this.flyingSE = this.sound.add('flyingAngel');
     let loopMaker2 = {
       name: 'loop',
@@ -140,13 +167,12 @@ class Main extends Phaser.Scene {
     // 赤ちゃん天使
     this.littleangels = this.physics.add.group();
     this.littleangels.create(30, stageHeight-850, 'littleangel');
-    //this.littleangels.create(800, stageHeight-700, 'littleangel');
     this.littleangels.create(800, stageHeight-2200, 'littleangel');
-    this.littleangels.create(550, stageHeight-1200, 'littleangel');
     this.littleangels.children.entries.forEach((littleangel)=>{
       littleangel.body.setSize(100,80, 1, 1);
       littleangel.body.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
       littleangel.body.setCollideWorldBounds(false);
+      littleangel.anims.play('littleangelIdle', true);
     });
     // 敵の悪魔
     this.enemies = this.physics.add.group();
@@ -154,8 +180,9 @@ class Main extends Phaser.Scene {
     this.enemies.create(50, stageHeight-2000, 'demon');
     this.enemies.children.entries.forEach(enemy => {
       enemy.body.setSize(100, 100, 1, 1);
-      enemy.body.setBounce(0.4);
+      enemy.body.setBounce(Phaser.Math.FloatBetween(0.4, 0.8));
       enemy.body.setCollideWorldBounds(false);
+      enemy.anims.play('demonIdle', true);
       this.physics.add.collider(this.player, enemy);
       this.physics.add.collider(enemy, this.ground);
       this.physics.add.collider(enemy, this.clouds);
@@ -422,11 +449,12 @@ let config = {
         y: 400
       },
       // debug
-      debug: true
+      debug: false
+      //debug: true
     }
   },
   // debug
-  //scene: [FirstLoading, Title, Main, GameOver, GameClear]
-  scene: [Main, GameOver, GameClear]
+  scene: [FirstLoading, Title, Main, GameOver, GameClear]
+  //scene: [Main, GameOver, GameClear]
 };
 let fane = new Phaser.Game(config);
