@@ -7,6 +7,7 @@ class Main extends Phaser.Scene {
     this.load.image('bgLayer2', 'asset/bg/bgLayer2.png');
     this.load.image('bgLayer3', 'asset/bg/bgLayer3.png');
     this.load.image('ground', 'asset/bg/ground.png');
+    // TODO: SpriteSheetに差し替え
     this.load.image('player', 'asset/characters/angel.png');
     /*
     this.load.spritesheet('player', 'asset/spritesheet.png', {
@@ -15,24 +16,21 @@ class Main extends Phaser.Scene {
     });
     */
     this.load.image('littleangel', 'asset/characters/littleangel.png');
-    // TODO: 音入れる
-    //this.load.audio('se', 'asset/se.mp3');
-    //
     this.load.image('block', 'asset/bg/block.png');
     this.load.image('demon', 'asset/characters/demon.png');
     this.load.image('goal', 'asset/bg/goal.png');
-    //
-    this.load.audio('bgmLoop', 'asset/sounds/bgm.mp3');
+    this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
+    this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
+    this.load.audio('stageBGM', 'asset/sounds/stagebgm.mp3');
   }
   create() {
     //this.scene.start('GameClear');
     //this.scene.start('GameOver');
     // 赤ちゃん救出処理
-    // TODO: 赤ちゃん天使救出効果音挿入
-    //this.seMusic = this.sound.add('se');
+    this.getLittleAngelSE = this.sound.add('getLittleAngel');
     let collectStar = function (player, star) {
       star.destroy();
-      //this.seMusic.play();
+      this.getLittleAngelSE.play();
       this.score += 1;
       this.scoreText.setText('Score: '+this.score);
     }
@@ -47,7 +45,7 @@ class Main extends Phaser.Scene {
       this.scene.start('GameClear');
     }
     // BGM
-    this.backgroundMusic = this.sound.add('bgmLoop');
+    this.backgroundMusic = this.sound.add('stageBGM');
     let loopMaker = {
       name: 'loop',
       start: 0,
@@ -70,14 +68,13 @@ class Main extends Phaser.Scene {
     this.add.image(600, 800, 'bgLayer2').setScrollFactor(0);
     this.add.image(600, 800, 'bgLayer3').setScrollFactor(0);
     // スコア
-    // TODO: スコアが正しく表示されるように
     this.score = new Number();
     this.scoreText = this.add.text(16, 16, 'score:'+Number(0), {
       fontSize: '64px',
       fill: '#ffe663'
     }).setScrollFactor(0);
     // 地面
-    // TODO: 画面幅を揃える
+    // TODO: 画面幅と揃える
     this.ground = this.physics.add.staticSprite(400, height-32, 'ground');
     // 背景
     this.add.image(600, 800, 'bg');
@@ -129,6 +126,16 @@ class Main extends Phaser.Scene {
       repeat: -1
     });
     */
+    this.flyingSE = this.sound.add('flyingAngel');
+    let loopMaker2 = {
+      name: 'loop',
+      start: 0,
+      duration: 2,
+      config: {
+        loop: true
+      }
+    };
+    this.flyingSE.addMarker(loopMaker2);
     this.cameras.main.startFollow(this.player, true);
     // 赤ちゃん天使
     this.littleangels = this.physics.add.group();
@@ -136,7 +143,7 @@ class Main extends Phaser.Scene {
     this.littleangels.create(800, height-700, 'littleangel');
     this.littleangels.create(550, height-1200, 'littleangel');
     this.littleangels.children.entries.forEach((littleangel)=>{
-      littleangel.body.setSize(100, 100, 1, 1);
+      littleangel.body.setSize(100,80, 1, 1);
       littleangel.body.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     });
     // 雲
@@ -152,12 +159,12 @@ class Main extends Phaser.Scene {
     });
     // 敵の悪魔
     // TODO: 一定間隔でプレイヤーの周辺にスポーンするように, 当たり判定をいい感じにする
+    /*
     this.enemies = this.physics.add.group();
     let genEnemy = ()=>{
       this.enemies.children.entries.forEach(enemy => {
         enemy.destroy();
       });
-      /*
       const spawnRange = 30;
       console.log(
         (this.player.x-(this.player.width/2))-spawnRange,
@@ -165,7 +172,6 @@ class Main extends Phaser.Scene {
         this.player.x+(this.player.width/2),
         (this.player.x+(this.player.width/2))+spawnRange
       );
-      */
       this.enemies.create(50, height-300, 'demon');
       this.enemies.children.entries.forEach(enemy => {
         enemy.body.setSize(100, 100, 1, 1);
@@ -184,7 +190,8 @@ class Main extends Phaser.Scene {
       setTimeout(function(){doLoop(++i)}, getInterval());
     }
     genEnemy();
-    //doLoop(0);
+    doLoop(0);
+    */
     // colliderを設定
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.littleangels, this.ground);
@@ -200,6 +207,9 @@ class Main extends Phaser.Scene {
       // 地面にいるときの左右キー処理
       if (this.cursors.up.isDown) {
         this.player.setVelocityY(-600);
+        this.flyingSE.play('loop', {
+          delay: 0
+        });
         //this.player.anims.play('jump', true);
       } else if (this.cursors.right.isDown) {
         this.player.setVelocityX(400);
@@ -214,6 +224,8 @@ class Main extends Phaser.Scene {
     } else {
       if (this.player.body.newVelocity.y>0) {
         //this.player.anims.play('idle', true);
+        // TODO: いい感じに音が流れるように
+        this.flyingSE.stop();
       }
       if (this.cursors.right.isDown) {
         this.player.setVelocityX(400);
@@ -224,28 +236,102 @@ class Main extends Phaser.Scene {
   }
 }
 
+class FirstLoading extends Phaser.Scene {
+  //
+  constructor() {
+    super('FirstLoading');
+  }
+  preload() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+    const _this = this;
+    //
+    let loadingArea = this.add.graphics();
+    loadingArea.fillStyle(0x222222, 1);
+    loadingArea.fillRect(0, 0, 828, 1366);
+    //
+    let progressArea = this.add.graphics();
+    progressArea.fillStyle(0x000000, 0.8);
+    progressArea.fillRect(240, height/2, 320, 50);
+    let progressBar = this.add.graphics();
+    //
+    let loadingText = this.add.text((width/2)-250, (height/3)+100, 'Now Loading...', {
+      fontSize: '64px',
+      fill: '#ffffff'
+    });
+    this.load.on('progress', function (value) {
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(250, height/2, 300 * value, 30);
+    });
+    this.load.on('complete', function () {
+      loadingText.destroy();
+      loadingText = _this.add.text((width/2)-180, (height/3)+100, 'Complete!', {
+        fontSize: '64px',
+        fill: '#ffffff'
+      });
+      _this.add.text(90, (height/3)*2, 'NEXT : SPACE KEY', {
+        fontSize: '64px',
+        fill: '#ffffff'
+      })
+    });
+    this.load.audio('selectSE', 'asset/sounds/select.mp3');
+  }
+  create() {
+    this.selectSE = this.sound.add('selectSE');
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+  }
+  update() {
+    if (this.spaceKey.isDown) {
+      this.selectSE.play();
+      this.scene.start('Title');
+    }
+  }
+}
+
 class Title extends Phaser.Scene {
   constructor() {
     super('Title');
   }
   preload() {
+    this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
+    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.selectSE = this.sound.add('selectSE');
+    // BGM
+    this.titleBGM = this.sound.add('titleBGM');
+    let loopMaker = {
+      name: 'loop',
+      start: 0,
+      duration: 23,
+      config: {
+        loop: true
+      }
+    };
+    this.titleBGM.addMarker(loopMaker);
+    this.titleBGM.play('loop', {
+      delay: 1
+    });
     // TODO: タイトル画面
-    const width = 828;
-    const height = 1366;
+    const width = this.scale.width;
+    const height = this.scale.height;
     this.add.text((width/2)-70, height/3, 'TITLE', {
       fontSize: '64px',
       fill: 'red'
     });
-    this.add.text((width/2)-70, (height/3)*2, 'START', {
+    this.add.text(90, (height/3)*2, 'START : SPACE KEY', {
       fontSize: '64px',
       fill: '#000000'
-    }).setInteractive().on('pointerdown', ()=>{
-      this.scene.start('Main');
-    });
+    })
   }
   update() {
+    if (this.spaceKey.isDown) {
+      this.titleBGM.stop();
+      this.selectSE.play();
+      this.scene.start('Main');
+    }
   }
 }
 
@@ -257,8 +343,10 @@ class GameOver extends Phaser.Scene {
     // TODO: 背景素材の差し替え
     this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
     this.load.image('gameOverImg', 'asset/scene/gameover.png');
+    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
+    this.selectSE = this.sound.add('selectSE');
     this.gameOverSound = this.sound.add('gameOverSound');
     this.gameOverSound.play();
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -272,6 +360,7 @@ class GameOver extends Phaser.Scene {
     if (this.spaceKey.isDown) {
       this.gameOverSound.stop();
       this.gameOverImg.destroy();
+      this.selectSE.play();
       this.scene.start('Main');
     }
   }
@@ -288,8 +377,10 @@ class GameClear extends Phaser.Scene {
     this.load.image('gameClearImg1', 'asset/scene/gameclear1.png');
     this.load.image('gameClearImg2', 'asset/scene/gameclear2.png');
     this.load.image('gameClearImg3', 'asset/scene/gameclear3.png');
+    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
+    this.selectSE = this.sound.add('selectSE');
     this.gameClearSoundNormal = this.sound.add('gameClearSoundNormal');
     this.gameClearSoundComplete = this.sound.add('gameClearSoundComplete');
     // スコアに応じたエンディング変化
@@ -317,7 +408,10 @@ class GameClear extends Phaser.Scene {
   }
   update() {
     if (this.spaceKey.isDown) {
+      this.gameClearSoundNormal.stop();
+      this.gameClearSoundComplete.stop();
       this.gameClearImg.destroy();
+      this.selectSE.play();
       this.scene.start('Main');
     }
   }
@@ -343,6 +437,8 @@ let config = {
       debug: false
     }
   },
-  scene: [Title, Main, GameOver, GameClear]
+  // debug
+  scene: [FirstLoading, Title, Main, GameOver, GameClear]
+  //scene: [Main, GameOver, GameClear]
 };
 let fane = new Phaser.Game(config);
