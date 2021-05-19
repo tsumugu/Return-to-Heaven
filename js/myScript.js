@@ -38,7 +38,7 @@ class Main extends Phaser.Scene {
       star.destroy();
       this.getLittleAngelSE.play();
       this.score += 1;
-      this.scoreText.setText('Score: '+this.score);
+      this.scoreText.setText(this.score+'/3');
     }
     // ゲームオーバー処理
     let gameOver = function (player, enemy) {
@@ -119,8 +119,10 @@ class Main extends Phaser.Scene {
     this.ground.setSize(width, 50, 1, 1);
     // 雲
     this.clouds = this.physics.add.staticGroup();
-    this.clouds.create(50, stageHeight-2850, 'cloud');
-    this.clouds.create(800, stageHeight-2550, 'cloud');
+    this.clouds.create(750, stageHeight-3400, 'cloud');
+    this.clouds.create(10, stageHeight-3200, 'cloud');
+    this.clouds.create(200, stageHeight-3000, 'cloud');
+    this.clouds.create(900, stageHeight-2600, 'cloud');
     this.clouds.create(300, stageHeight-2250, 'cloud');
     this.clouds.create(800, stageHeight-2000, 'cloud');
     this.clouds.create(50, stageHeight-1850, 'cloud');
@@ -136,21 +138,29 @@ class Main extends Phaser.Scene {
     });
     // スコア
     this.score = new Number();
-    /*
-    font-family: 'DotGothic16', sans-serif;
-    */
-    this.scoreText = this.add.text(16, 16, 'score:'+Number(0), {
+    this.add.text(16, 32, '助けた天使の数: ', {
+      fontSize: '42px',
+      fill: '#ff99e7',
+      fontFamily: 'DotGothic16'
+    }).setScrollFactor(0);
+    this.scoreText = this.add.text(340, 16, '0/3', {
       fontSize: '64px',
       fill: '#ff99e7',
       fontFamily: 'DotGothic16'
     }).setScrollFactor(0);
     // ゴール
-    this.goal = this.physics.add.staticSprite(780, stageHeight-1450, 'goal');
+    this.goal = this.physics.add.staticSprite(785, stageHeight-3550, 'goal');
+    this.goal.scale = 1.2;
     this.goal.setSize(150, 150, 1, 1);
     // プレイヤー
+    //↓初期位置
     this.player = this.physics.add.sprite(600, stageHeight-200, 'player');
     // debug
+    //↓ゴールの手前
+    //this.player = this.physics.add.sprite(600, stageHeight-1400, 'player');
+    //↓ステージの一番上
     //this.player = this.physics.add.sprite(300, stageHeight-2500, 'player');
+    //
     this.player.setSize(80, 170, 1, 1);
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
@@ -166,8 +176,9 @@ class Main extends Phaser.Scene {
     this.flyingSE.addMarker(loopMaker2);
     // 赤ちゃん天使
     this.littleangels = this.physics.add.group();
-    this.littleangels.create(30, stageHeight-850, 'littleangel');
+    this.littleangels.create(30, stageHeight-3400, 'littleangel');
     this.littleangels.create(800, stageHeight-2200, 'littleangel');
+    this.littleangels.create(30, stageHeight-1200, 'littleangel');
     this.littleangels.children.entries.forEach((littleangel)=>{
       littleangel.body.setSize(100,80, 1, 1);
       littleangel.body.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
@@ -176,12 +187,15 @@ class Main extends Phaser.Scene {
     });
     // 敵の悪魔
     this.enemies = this.physics.add.group();
-    this.enemies.create(130, stageHeight-850, 'demon');
+    this.enemies.create(200, stageHeight-3200, 'demon');
     this.enemies.create(50, stageHeight-2000, 'demon');
+    this.enemies.create(130, stageHeight-1200, 'demon');
     this.enemies.children.entries.forEach(enemy => {
       enemy.body.setSize(100, 100, 1, 1);
       enemy.body.setBounce(Phaser.Math.FloatBetween(0.4, 0.8));
-      enemy.body.setCollideWorldBounds(false);
+      // 要検討@難易度調整: 敵がステージ外に消えていかなくなる
+      //enemy.body.setCollideWorldBounds(false);
+      enemy.body.setCollideWorldBounds(true);
       enemy.anims.play('demonIdle', true);
       this.physics.add.collider(this.player, enemy);
       this.physics.add.collider(enemy, this.ground);
@@ -230,10 +244,11 @@ class Main extends Phaser.Scene {
         this.player.setVelocityX(-400);
         this.player.anims.play('left', true);
       } else {
-        this.player.setVelocityX(0);
+        // 要検討@難易度調整: これコメントアウトすると雲がつるつるになる。
+        //this.player.setVelocityX(0);
         // 羽ばたき音停止
         this.flyingSE.stop();
-        // 存在しないkeyを指定するとそのポイントで停止できる。(あまり良くない実装...)
+        // 存在しないkeyを指定するとそのポイントで停止できる。(あまり良くない実装方法...)
         this.player.anims.play('idle', true);
       }
     } else {
@@ -360,6 +375,8 @@ class GameOver extends Phaser.Scene {
     this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
+    const width = this.scale.width;
+    const height = this.scale.height;
     this.selectSE = this.sound.add('selectSE');
     this.gameOverSound = this.sound.add('gameOverSound');
     this.gameOverSound.play();
@@ -394,6 +411,8 @@ class GameClear extends Phaser.Scene {
     this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
+    const width = this.scale.width;
+    const height = this.scale.height;
     this.selectSE = this.sound.add('selectSE');
     this.gameClearSoundNormal = this.sound.add('gameClearSoundNormal');
     this.gameClearSoundComplete = this.sound.add('gameClearSoundComplete');
@@ -402,16 +421,16 @@ class GameClear extends Phaser.Scene {
     let score = this.MainScene.score;
     if (score <= 0) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(400, 300, 'gameClearImg1');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg1');
     } else if (score == 1) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(400, 300, 'gameClearImg1');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg1');
     } else if (score == 2) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(400, 300, 'gameClearImg2');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg2');
     } else if (score == 3) {
       this.gameClearSoundComplete.play();
-      this.gameClearImg = this.add.image(400, 300, 'gameClearImg3');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg3');
     }
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     // TODO: テキストをよき感じに入れる(画像埋め込みでも良いかも)
