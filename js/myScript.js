@@ -4,27 +4,6 @@ class Main extends Phaser.Scene {
     super('Main');
   }
   preload() {
-    this.load.image('bgLayer1', 'asset/bg/bgLayer1.png');
-    this.load.image('bgLayer2', 'asset/bg/bgLayer2.png');
-    this.load.image('bgLayer3', 'asset/bg/bgLayer3.png');
-    this.load.image('ground', 'asset/bg/ground.png');
-    this.load.spritesheet('player', 'asset/characters/angelspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.spritesheet('demon', 'asset/characters/demonspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.spritesheet('littleangel', 'asset/characters/littleangelspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.image('cloud', 'asset/bg/cloud.png');
-    this.load.image('goal', 'asset/bg/goal.png');
-    this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
-    this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
-    this.load.audio('stageBGM', 'asset/sounds/stagebgm.mp3');
   }
   create() {
     const stageHeight = 4000;
@@ -325,8 +304,45 @@ class FirstLoading extends Phaser.Scene {
       })
       _this.isLoadCompleted = true;
     });
-    // TODO: FirstLoadingで全素材をLoadしたい
+    // 全素材をロード
     this.load.audio('selectSE', 'asset/sounds/select.mp3');
+    // Title
+    this.load.image('titleBG', 'asset/bg/titleBG.png');
+    this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
+    // GameOver
+    // TODO: 背景素材の差し替え
+    this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
+    this.load.image('gameOverImg', 'asset/scene/gameover.png');
+    // GameClear
+    // TODO: 背景素材の差し替え
+    this.load.audio('gameClearSoundNormal', 'asset/sounds/gameclear1.mp3');
+    this.load.audio('gameClearSoundComplete', 'asset/sounds/gameclear2.mp3');
+    this.load.image('gameClearImg1', 'asset/scene/gameclear1.png');
+    this.load.image('gameClearImg2', 'asset/scene/gameclear2.png');
+    this.load.image('gameClearImg3', 'asset/scene/gameclear3.png');
+    // Main
+    this.load.image('bgLayer1', 'asset/bg/bgLayer1.png');
+    this.load.image('bgLayer2', 'asset/bg/bgLayer2.png');
+    this.load.image('bgLayer3', 'asset/bg/bgLayer3.png');
+    this.load.image('ground', 'asset/bg/ground.png');
+    this.load.spritesheet('player', 'asset/characters/angelspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.spritesheet('demon', 'asset/characters/demonspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.spritesheet('littleangel', 'asset/characters/littleangelspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.image('cloud', 'asset/bg/cloud.png');
+    this.load.image('goal', 'asset/bg/goal.png');
+    this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
+    this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
+    this.load.audio('stageBGM', 'asset/sounds/stagebgm.mp3');
+    //
   }
   create() {
     this.selectSE = this.sound.add('selectSE');
@@ -345,9 +361,6 @@ class Title extends Phaser.Scene {
     super('Title');
   }
   preload() {
-    this.load.image('titleBG', 'asset/bg/titleBG.png');
-    this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
-    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
     const width = this.scale.width;
@@ -390,10 +403,6 @@ class GameOver extends Phaser.Scene {
     super('GameOver');
   }
   preload() {
-    // TODO: 背景素材の差し替え
-    this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
-    this.load.image('gameOverImg', 'asset/scene/gameover.png');
-    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
     const width = this.scale.width;
@@ -423,13 +432,6 @@ class GameClear extends Phaser.Scene {
     super('GameClear');
   }
   preload() {
-    // TODO: 背景素材の差し替え
-    this.load.audio('gameClearSoundNormal', 'asset/sounds/gameclear1.mp3');
-    this.load.audio('gameClearSoundComplete', 'asset/sounds/gameclear2.mp3');
-    this.load.image('gameClearImg1', 'asset/scene/gameclear1.png');
-    this.load.image('gameClearImg2', 'asset/scene/gameclear2.png');
-    this.load.image('gameClearImg3', 'asset/scene/gameclear3.png');
-    this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
     const width = this.scale.width;
