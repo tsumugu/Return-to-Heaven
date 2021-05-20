@@ -270,6 +270,7 @@ class FirstLoading extends Phaser.Scene {
     const height = this.scale.height;
     const _this = this;
     this.isLoadCompleted = false;
+    var progressBarPos = 220;
     //
     let loadingArea = this.add.graphics();
     loadingArea.fillStyle(0x222222, 1);
@@ -277,7 +278,7 @@ class FirstLoading extends Phaser.Scene {
     //
     let progressArea = this.add.graphics();
     progressArea.fillStyle(0x000000, 0.8);
-    progressArea.fillRect(240, height/2, 320, 50);
+    progressArea.fillRect(progressBarPos-10, height/2, 320, 50);
     let progressBar = this.add.graphics();
     //
     let loadingText = this.add.text((width/2)-220, (height/3)+100, 'Now Loading...', {
@@ -285,11 +286,20 @@ class FirstLoading extends Phaser.Scene {
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
     });
+    //
+    let progressValueText = this.add.text(progressBarPos+340, height/2, '0%', {
+      fontSize: '32px',
+      fill: '#ffffff',
+      fontFamily: 'DotGothic16'
+    }).setOrigin(0.5, 0);
+    //
     this.load.on('progress', function (value) {
-        progressBar.clear();
-        progressBar.fillStyle(0xffffff, 1);
-        progressBar.fillRect(250, height/2, 300 * value, 30);
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(progressBarPos, height/2, 300 * value, 30);
+      progressValueText.setText(value*100+"%");
     });
+    //
     this.load.on('complete', function () {
       loadingText.destroy();
       loadingText = _this.add.text((width/2)-290, (height/3)+100, 'Loading Completed!', {
@@ -382,6 +392,7 @@ class Title extends Phaser.Scene {
     this.titleBGM.play('loop', {
       delay: 0.5
     });
+    //
     this.add.text(150, (height/6)*5, 'Press SPACE KEY!', {
       fontSize: '64px',
       //fill: '#000000',
@@ -407,11 +418,14 @@ class GameOver extends Phaser.Scene {
   create() {
     const width = this.scale.width;
     const height = this.scale.height;
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    //
     this.selectSE = this.sound.add('selectSE');
     this.gameOverSound = this.sound.add('gameOverSound');
     this.gameOverSound.play();
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    //
     this.gameOverImg = this.add.image(width/2, height/2, 'gameOverImg');
+    //
     this.add.text(120, height-150, 'RESTART : SPACE KEY', {
       fontSize: '64px',
       fill: '#ffffff',
@@ -436,6 +450,8 @@ class GameClear extends Phaser.Scene {
   create() {
     const width = this.scale.width;
     const height = this.scale.height;
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    //
     this.selectSE = this.sound.add('selectSE');
     this.gameClearSoundNormal = this.sound.add('gameClearSoundNormal');
     this.gameClearSoundComplete = this.sound.add('gameClearSoundComplete');
@@ -455,7 +471,7 @@ class GameClear extends Phaser.Scene {
       this.gameClearSoundComplete.play();
       this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg3');
     }
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    //
     this.add.text(120, height-150, 'RESTART : SPACE KEY', {
       fontSize: '64px',
       fill: '#000000',
