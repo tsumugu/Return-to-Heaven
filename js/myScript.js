@@ -1,3 +1,4 @@
+// TODO: 難易度調整
 class Main extends Phaser.Scene {
   constructor() {
     super('Main');
@@ -29,6 +30,7 @@ class Main extends Phaser.Scene {
     const stageHeight = 4000;
     const width = this.scale.width;
     const height = this.scale.height;
+    const _this = this;
     // カメラと世界の範囲を設定
     this.cameras.main.setBounds(0, 0, 828, stageHeight);
     this.physics.world.setBounds(0, 0, 828, stageHeight);
@@ -42,6 +44,7 @@ class Main extends Phaser.Scene {
     }
     // ゲームオーバー処理
     let gameOver = function (player, enemy) {
+      this.flyingSE.stop();
       this.backgroundMusic.stop();
       this.scene.start('GameOver');
     }
@@ -70,7 +73,25 @@ class Main extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: 'left',
+      key: 'leftwalk',
+      frames: this.anims.generateFrameNumbers('player', {
+        start: 0,
+        end: 0
+      }),
+      frameRate: 1,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'rightwalk',
+      frames: this.anims.generateFrameNumbers('player', {
+        start: 4,
+        end: 4
+      }),
+      frameRate: 1,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'leftfly',
       frames: this.anims.generateFrameNumbers('player', {
         start: 0,
         end: 1
@@ -79,7 +100,7 @@ class Main extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: 'right',
+      key: 'rightfly',
       frames: this.anims.generateFrameNumbers('player', {
         start: 4,
         end: 5
@@ -108,7 +129,7 @@ class Main extends Phaser.Scene {
     };
     this.backgroundMusic.addMarker(loopMaker);
     this.backgroundMusic.play('loop', {
-      delay: 0
+      delay: 0.5
     });
     // 背景
     this.add.image(width/2, height/2, 'bgLayer1').setScrollFactor(0);
@@ -125,7 +146,9 @@ class Main extends Phaser.Scene {
     this.clouds.create(900, stageHeight-2600, 'cloud');
     this.clouds.create(300, stageHeight-2250, 'cloud');
     this.clouds.create(800, stageHeight-2000, 'cloud');
-    this.clouds.create(50, stageHeight-1850, 'cloud');
+    // 要検討@難易度調整: 1850ではすきまをプレイヤーが抜けられない
+    this.clouds.create(50, stageHeight-1870, 'cloud');
+    //this.clouds.create(50, stageHeight-1850, 'cloud');
     this.clouds.create(300, stageHeight-1550, 'cloud');
     this.clouds.create(800, stageHeight-1350, 'cloud');
     this.clouds.create(50, stageHeight-1050, 'cloud');
@@ -153,14 +176,7 @@ class Main extends Phaser.Scene {
     this.goal.scale = 1.2;
     this.goal.setSize(150, 150, 1, 1);
     // プレイヤー
-    //↓初期位置
     this.player = this.physics.add.sprite(600, stageHeight-200, 'player');
-    // debug
-    //↓ゴールの手前
-    //this.player = this.physics.add.sprite(600, stageHeight-1400, 'player');
-    //↓ステージの一番上
-    //this.player = this.physics.add.sprite(300, stageHeight-2500, 'player');
-    //
     this.player.setSize(80, 170, 1, 1);
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
@@ -239,25 +255,27 @@ class Main extends Phaser.Scene {
         this.player.anims.play('jump', true);
       } else if (this.cursors.right.isDown) {
         this.player.setVelocityX(400);
-        this.player.anims.play('right', true);
+        this.player.anims.play('rightwalk', true);
+        this.flyingSE.stop();
       } else if (this.cursors.left.isDown) {
         this.player.setVelocityX(-400);
-        this.player.anims.play('left', true);
+        this.player.anims.play('leftwalk', true);
+        this.flyingSE.stop();
       } else {
         // 要検討@難易度調整: これコメントアウトすると雲がつるつるになる。
         //this.player.setVelocityX(0);
         // 羽ばたき音停止
         this.flyingSE.stop();
-        // 存在しないkeyを指定するとそのポイントで停止できる。(あまり良くない実装方法...)
-        this.player.anims.play('idle', true);
+        // 1フレーム目でアニメーション停止
+        this.player.anims.stop(null, true);
       }
     } else {
       if (this.cursors.right.isDown) {
         this.player.setVelocityX(400);
-        this.player.anims.play('right', true);
+        this.player.anims.play('rightfly', true);
       } else if (this.cursors.left.isDown) {
         this.player.setVelocityX(-400);
-        this.player.anims.play('left', true);
+        this.player.anims.play('leftfly', true);
       }
     }
   }
@@ -272,6 +290,7 @@ class FirstLoading extends Phaser.Scene {
     const width = this.scale.width;
     const height = this.scale.height;
     const _this = this;
+    this.isLoadCompleted = false;
     //
     let loadingArea = this.add.graphics();
     loadingArea.fillStyle(0x222222, 1);
@@ -282,9 +301,10 @@ class FirstLoading extends Phaser.Scene {
     progressArea.fillRect(240, height/2, 320, 50);
     let progressBar = this.add.graphics();
     //
-    let loadingText = this.add.text((width/2)-250, (height/3)+100, 'Now Loading...', {
+    let loadingText = this.add.text((width/2)-220, (height/3)+100, 'Now Loading...', {
       fontSize: '64px',
-      fill: '#ffffff'
+      fill: '#ffffff',
+      fontFamily: 'DotGothic16'
     });
     this.load.on('progress', function (value) {
         progressBar.clear();
@@ -293,15 +313,19 @@ class FirstLoading extends Phaser.Scene {
     });
     this.load.on('complete', function () {
       loadingText.destroy();
-      loadingText = _this.add.text((width/2)-180, (height/3)+100, 'Complete!', {
+      loadingText = _this.add.text((width/2)-290, (height/3)+100, 'Loading Completed!', {
         fontSize: '64px',
-        fill: '#ffffff'
+        fill: '#ffffff',
+        fontFamily: 'DotGothic16'
       });
-      _this.add.text(90, (height/3)*2, 'NEXT : SPACE KEY', {
+      _this.add.text(150, (height/6)*5, 'NEXT : SPACE KEY', {
         fontSize: '64px',
-        fill: '#ffffff'
+        fill: '#ffffff',
+        fontFamily: 'DotGothic16'
       })
+      _this.isLoadCompleted = true;
     });
+    // TODO: FirstLoadingで全素材をLoadしたい
     this.load.audio('selectSE', 'asset/sounds/select.mp3');
   }
   create() {
@@ -309,7 +333,7 @@ class FirstLoading extends Phaser.Scene {
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
   update() {
-    if (this.spaceKey.isDown) {
+    if (this.spaceKey.isDown && this.isLoadCompleted) {
       this.selectSE.play();
       this.scene.start('Title');
     }
@@ -343,16 +367,13 @@ class Title extends Phaser.Scene {
     };
     this.titleBGM.addMarker(loopMaker);
     this.titleBGM.play('loop', {
-      delay: 1
+      delay: 0.5
     });
-    // TODO: タイトル画面
-    this.add.text((width/2)-70, height/3, 'TITLE', {
+    this.add.text(150, (height/6)*5, 'Press SPACE KEY!', {
       fontSize: '64px',
-      fill: 'red'
-    });
-    this.add.text(90, (height/3)*2, 'START : SPACE KEY', {
-      fontSize: '64px',
-      fill: '#000000'
+      //fill: '#000000',
+      fill: '#8586fb',
+      fontFamily: 'DotGothic16'
     })
   }
   update() {
@@ -381,16 +402,16 @@ class GameOver extends Phaser.Scene {
     this.gameOverSound = this.sound.add('gameOverSound');
     this.gameOverSound.play();
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.gameOverImg = this.add.image(400, 300, 'gameOverImg');
-    this.exprainText = this.add.text(180, 400, 'RESTART : Press SPACE KEY', {
-      fontSize: '32px',
-      fill: '#ffffff'
-    });
+    this.gameOverImg = this.add.image(width/2, height/2, 'gameOverImg');
+    this.add.text(120, height-150, 'RESTART : SPACE KEY', {
+      fontSize: '64px',
+      fill: '#ffffff',
+      fontFamily: 'DotGothic16'
+    })
   }
   update() {
     if (this.spaceKey.isDown) {
       this.gameOverSound.stop();
-      this.gameOverImg.destroy();
       this.selectSE.play();
       this.scene.start('Main');
     }
@@ -433,17 +454,16 @@ class GameClear extends Phaser.Scene {
       this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg3');
     }
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    // TODO: テキストをよき感じに入れる(画像埋め込みでも良いかも)
-    this.exprainText = this.add.text(180, 400, 'RESTART : Press SPACE KEY', {
-      fontSize: '32px',
-      fill: '#ffffff'
-    });
+    this.add.text(120, height-150, 'RESTART : SPACE KEY', {
+      fontSize: '64px',
+      fill: '#000000',
+      fontFamily: 'DotGothic16'
+    })
   }
   update() {
     if (this.spaceKey.isDown) {
       this.gameClearSoundNormal.stop();
       this.gameClearSoundComplete.stop();
-      this.gameClearImg.destroy();
       this.selectSE.play();
       this.scene.start('Main');
     }
@@ -467,13 +487,9 @@ let config = {
       gravity: {
         y: 400
       },
-      // debug
       debug: false
-      //debug: true
     }
   },
-  // debug
   scene: [FirstLoading, Title, Main, GameOver, GameClear]
-  //scene: [Main, GameOver, GameClear]
 };
 let fane = new Phaser.Game(config);
