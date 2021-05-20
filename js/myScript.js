@@ -140,12 +140,12 @@ class Main extends Phaser.Scene {
     });
     // スコア
     this.score = new Number();
-    this.add.text(16, 32, '助けた天使の数: ', {
+    this.add.text(16, 32, "助けた天使の数: ", {
       fontSize: '42px',
       fill: '#ff99e7',
       fontFamily: 'DotGothic16'
     }).setScrollFactor(0);
-    this.scoreText = this.add.text(340, 16, '0/3', {
+    this.scoreText = this.add.text(340, 16, "0/3", {
       fontSize: '64px',
       fill: '#ff99e7',
       fontFamily: 'DotGothic16'
@@ -281,13 +281,13 @@ class FirstLoading extends Phaser.Scene {
     progressArea.fillRect(progressBarPos-10, height/2, 320, 50);
     let progressBar = this.add.graphics();
     //
-    let loadingText = this.add.text((width/2)-220, (height/3)+100, 'Now Loading...', {
+    let loadingText = this.add.text((width/2)-220, (height/3)+100, "Now Loading...", {
       fontSize: '64px',
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
     });
     //
-    let progressValueText = this.add.text(progressBarPos+340, height/2, '0%', {
+    let progressValueText = this.add.text(progressBarPos+340, height/2, "0%", {
       fontSize: '32px',
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
@@ -297,17 +297,18 @@ class FirstLoading extends Phaser.Scene {
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(progressBarPos, height/2, 300 * value, 30);
+      loadingText.setText("Now Loading...");
       progressValueText.setText(Math.floor(value*100)+"%");
     });
     //
     this.load.on('complete', function () {
       loadingText.destroy();
-      loadingText = _this.add.text((width/2)-290, (height/3)+100, 'Loading Completed!', {
+      loadingText = _this.add.text((width/2)-290, (height/3)+100, "Loading Completed!", {
         fontSize: '64px',
         fill: '#ffffff',
         fontFamily: 'DotGothic16'
       });
-      _this.add.text(150, (height/6)*5, 'NEXT : SPACE KEY', {
+      _this.add.text(150, (height/6)*5, "NEXT : SPACE KEY", {
         fontSize: '64px',
         fill: '#ffffff',
         fontFamily: 'DotGothic16'
@@ -393,7 +394,7 @@ class Title extends Phaser.Scene {
       delay: 0.5
     });
     //
-    this.add.text(150, (height/6)*5, 'Press SPACE KEY!', {
+    this.add.text(150, (height/6)*5, "Press SPACE KEY!", {
       fontSize: '64px',
       //fill: '#000000',
       fill: '#8586fb',
@@ -426,7 +427,7 @@ class GameOver extends Phaser.Scene {
     //
     this.gameOverImg = this.add.image(width/2, height/2, 'gameOverImg');
     //
-    this.add.text(120, height-150, 'RESTART : SPACE KEY', {
+    this.add.text(120, height-150, "RESTART : SPACE KEY", {
       fontSize: '64px',
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
@@ -472,7 +473,7 @@ class GameClear extends Phaser.Scene {
       this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg3');
     }
     //
-    this.add.text(120, height-150, 'RESTART : SPACE KEY', {
+    this.add.text(120, height-150, "RESTART : SPACE KEY", {
       fontSize: '64px',
       fill: '#000000',
       fontFamily: 'DotGothic16'
