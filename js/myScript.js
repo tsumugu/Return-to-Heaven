@@ -297,7 +297,7 @@ class FirstLoading extends Phaser.Scene {
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(progressBarPos, height/2, 300 * value, 30);
-      progressValueText.setText(value*100+"%");
+      progressValueText.setText(Math.floor(value)*100+"%");
     });
     //
     this.load.on('complete', function () {
