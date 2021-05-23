@@ -1,4 +1,191 @@
-// TODO: 難易度調整
+class FirstLoading extends Phaser.Scene {
+  //
+  constructor() {
+    super('FirstLoading');
+  }
+  preload() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+    const _this = this;
+    this.isLoadCompleted = false;
+    var progressBarPos = 220;
+    //
+    let loadingArea = this.add.graphics();
+    loadingArea.fillStyle(0x222222, 1);
+    loadingArea.fillRect(0, 0, 828, 1366);
+    //
+    let progressArea = this.add.graphics();
+    progressArea.fillStyle(0x000000, 0.8);
+    progressArea.fillRect(progressBarPos-10, height/2, 320, 50);
+    let progressBar = this.add.graphics();
+    //
+    let loadingText = this.add.text((width/2)-220, (height/3)+100, "Now Loading...", {
+      fontSize: '64px',
+      fill: '#ffffff',
+      fontFamily: 'DotGothic16'
+    });
+    //
+    let progressValueText = this.add.text(progressBarPos+340, height/2, "0%", {
+      fontSize: '32px',
+      fill: '#ffffff',
+      fontFamily: 'DotGothic16'
+    }).setOrigin(0.5, 0);
+    //
+    this.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(progressBarPos, height/2, 300 * value, 30);
+      progressValueText.setText(Math.floor(value*100)+"%");
+    });
+    //
+    this.load.on('complete', function () {
+      loadingText.destroy();
+      loadingText = _this.add.text((width/2)-290, (height/3)+100, "Loading Completed!", {
+        fontSize: '64px',
+        fill: '#ffffff',
+        fontFamily: 'DotGothic16'
+      });
+      _this.add.text(150, (height/6)*5, "NEXT : SPACE KEY", {
+        fontSize: '64px',
+        fill: '#ffffff',
+        fontFamily: 'DotGothic16'
+      })
+      _this.isLoadCompleted = true;
+    });
+    // 全素材をロード
+    // クリック時の効果音
+    this.load.audio('selectSE', 'asset/sounds/select.mp3');
+    // Title
+    this.load.image('title', 'asset/bg/title.png');
+    this.load.image('logo', 'asset/bg/logo.png');
+    //
+        /*
+    this.load.spritesheet('titleBG', 'asset/bg/titlespritesheet.png', {
+      frameWidth: 828,
+      frameHeight: 1366
+    });
+        */
+    //
+    this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
+    // GameOver
+    this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
+    this.load.image('gameOverImg', 'asset/scene/gameover.png');
+    // GameClear
+    this.load.audio('gameClearSoundNormal', 'asset/sounds/gameclear1.mp3');
+    this.load.audio('gameClearSoundComplete', 'asset/sounds/gameclear2.mp3');
+    this.load.image('gameClearImgNormal', 'asset/scene/gameclearnormal.png');
+    this.load.image('gameClearImgComplete', 'asset/scene/gameclearcomplete.png');
+    // Main
+    this.load.image('bgLayer1', 'asset/bg/bgLayer1.png');
+    this.load.image('bgLayer2', 'asset/bg/bgLayer2.png');
+    this.load.image('bgLayer3', 'asset/bg/bgLayer3.png');
+    this.load.image('ground', 'asset/bg/ground.png');
+    this.load.spritesheet('player', 'asset/characters/angelspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.spritesheet('demon', 'asset/characters/demonspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.spritesheet('littleangel', 'asset/characters/littleangelspritesheet.png', {
+      frameWidth: 200,
+      frameHeight: 200
+    });
+    this.load.image('cloud', 'asset/bg/cloud.png');
+    this.load.image('goal', 'asset/bg/goal.png');
+    this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
+    this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
+    this.load.audio('stageBGM', 'asset/sounds/stagebgm.mp3');
+    //
+  }
+  create() {
+    this.selectSE = this.sound.add('selectSE');
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+  }
+  update() {
+    if (this.spaceKey.isDown && this.isLoadCompleted) {
+      this.selectSE.play();
+      this.scene.start('Title');
+    }
+  }
+}
+
+class Title extends Phaser.Scene {
+  constructor() {
+    super('Title');
+  }
+  preload() {
+  }
+  create() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+    //
+    this.add.image(width/2, height/2, 'title');
+    this.logo = this.add.image(width/2, 460, 'logo');
+    this.logo.scale = 0.55;
+    this.logoDirection = "down";
+    this.upSpeed = 1;
+    this.downSpeed = 1.4;
+    this.topLimit = 460;
+    this.bottomLimit = 535;
+    // sprite使うver
+    /*
+    this.titleBG = this.add.sprite(width/2, height/2, 'titleBG');
+    this.anims.create({
+      key: 'titleAnim',
+      frames: this.anims.generateFrameNumbers('titleBG', {
+        start: 0,
+        end: 7
+      }),
+      frameRate: 4,
+      repeat: -1
+    });
+    this.titleBG.anims.play('titleAnim', true);
+    */
+    //
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.selectSE = this.sound.add('selectSE');
+    // BGM
+    this.titleBGM = this.sound.add('titleBGM');
+    let loopMaker = {
+      name: 'loop',
+      start: 0,
+      duration: 23,
+      config: {
+        loop: true
+      }
+    };
+    this.titleBGM.addMarker(loopMaker);
+    this.titleBGM.play('loop', {
+      delay: 0.5
+    });
+    //
+    this.add.text(150, (height/6)*5, "Press SPACE KEY!", {
+      fontSize: '64px',
+      fill: '#8586fb',
+      fontFamily: 'DotGothic16'
+    })
+  }
+  update() {
+    if (this.spaceKey.isDown) {
+      this.titleBGM.stop();
+      this.selectSE.play();
+      this.scene.start('Main');
+    }
+    if (this.logo.y<this.topLimit) {
+      this.logoDirection = "down";
+    } else if (this.logo.y>this.bottomLimit) {
+      this.logoDirection = "up";
+    }
+    if (this.logoDirection == "down") {
+      this.logo.y += this.downSpeed;
+    } else if (this.logoDirection== "up") {
+      this.logo.y -= this.upSpeed;
+    }
+  }
+}
+
 class Main extends Phaser.Scene {
   constructor() {
     super('Main');
@@ -260,156 +447,6 @@ class Main extends Phaser.Scene {
   }
 }
 
-class FirstLoading extends Phaser.Scene {
-  //
-  constructor() {
-    super('FirstLoading');
-  }
-  preload() {
-    const width = this.scale.width;
-    const height = this.scale.height;
-    const _this = this;
-    this.isLoadCompleted = false;
-    var progressBarPos = 220;
-    //
-    let loadingArea = this.add.graphics();
-    loadingArea.fillStyle(0x222222, 1);
-    loadingArea.fillRect(0, 0, 828, 1366);
-    //
-    let progressArea = this.add.graphics();
-    progressArea.fillStyle(0x000000, 0.8);
-    progressArea.fillRect(progressBarPos-10, height/2, 320, 50);
-    let progressBar = this.add.graphics();
-    //
-    let loadingText = this.add.text((width/2)-220, (height/3)+100, "Now Loading...", {
-      fontSize: '64px',
-      fill: '#ffffff',
-      fontFamily: 'DotGothic16'
-    });
-    //
-    let progressValueText = this.add.text(progressBarPos+340, height/2, "0%", {
-      fontSize: '32px',
-      fill: '#ffffff',
-      fontFamily: 'DotGothic16'
-    }).setOrigin(0.5, 0);
-    //
-    this.load.on('progress', function (value) {
-      progressBar.clear();
-      progressBar.fillStyle(0xffffff, 1);
-      progressBar.fillRect(progressBarPos, height/2, 300 * value, 30);
-      loadingText.setText("Now Loading...");
-      progressValueText.setText(Math.floor(value*100)+"%");
-    });
-    //
-    this.load.on('complete', function () {
-      loadingText.destroy();
-      loadingText = _this.add.text((width/2)-290, (height/3)+100, "Loading Completed!", {
-        fontSize: '64px',
-        fill: '#ffffff',
-        fontFamily: 'DotGothic16'
-      });
-      _this.add.text(150, (height/6)*5, "NEXT : SPACE KEY", {
-        fontSize: '64px',
-        fill: '#ffffff',
-        fontFamily: 'DotGothic16'
-      })
-      _this.isLoadCompleted = true;
-    });
-    // 全素材をロード
-    this.load.audio('selectSE', 'asset/sounds/select.mp3');
-    // Title
-    this.load.image('titleBG', 'asset/bg/titleBG.png');
-    this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
-    // GameOver
-    // TODO: 背景素材の差し替え
-    this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
-    this.load.image('gameOverImg', 'asset/scene/gameover.png');
-    // GameClear
-    // TODO: 背景素材の差し替え
-    this.load.audio('gameClearSoundNormal', 'asset/sounds/gameclear1.mp3');
-    this.load.audio('gameClearSoundComplete', 'asset/sounds/gameclear2.mp3');
-    this.load.image('gameClearImg1', 'asset/scene/gameclear1.png');
-    this.load.image('gameClearImg2', 'asset/scene/gameclear2.png');
-    this.load.image('gameClearImg3', 'asset/scene/gameclear3.png');
-    // Main
-    this.load.image('bgLayer1', 'asset/bg/bgLayer1.png');
-    this.load.image('bgLayer2', 'asset/bg/bgLayer2.png');
-    this.load.image('bgLayer3', 'asset/bg/bgLayer3.png');
-    this.load.image('ground', 'asset/bg/ground.png');
-    this.load.spritesheet('player', 'asset/characters/angelspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.spritesheet('demon', 'asset/characters/demonspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.spritesheet('littleangel', 'asset/characters/littleangelspritesheet.png', {
-      frameWidth: 200,
-      frameHeight: 200
-    });
-    this.load.image('cloud', 'asset/bg/cloud.png');
-    this.load.image('goal', 'asset/bg/goal.png');
-    this.load.audio('getLittleAngel', 'asset/sounds/score.mp3');
-    this.load.audio('flyingAngel', 'asset/sounds/flying.mp3');
-    this.load.audio('stageBGM', 'asset/sounds/stagebgm.mp3');
-    //
-  }
-  create() {
-    this.selectSE = this.sound.add('selectSE');
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-  }
-  update() {
-    if (this.spaceKey.isDown && this.isLoadCompleted) {
-      this.selectSE.play();
-      this.scene.start('Title');
-    }
-  }
-}
-
-class Title extends Phaser.Scene {
-  constructor() {
-    super('Title');
-  }
-  preload() {
-  }
-  create() {
-    const width = this.scale.width;
-    const height = this.scale.height;
-    this.add.image(width/2, height/2, 'titleBG');
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.selectSE = this.sound.add('selectSE');
-    // BGM
-    this.titleBGM = this.sound.add('titleBGM');
-    let loopMaker = {
-      name: 'loop',
-      start: 0,
-      duration: 23,
-      config: {
-        loop: true
-      }
-    };
-    this.titleBGM.addMarker(loopMaker);
-    this.titleBGM.play('loop', {
-      delay: 0.5
-    });
-    //
-    this.add.text(150, (height/6)*5, "Press SPACE KEY!", {
-      fontSize: '64px',
-      //fill: '#000000',
-      fill: '#8586fb',
-      fontFamily: 'DotGothic16'
-    })
-  }
-  update() {
-    if (this.spaceKey.isDown) {
-      this.titleBGM.stop();
-      this.selectSE.play();
-      this.scene.start('Main');
-    }
-  }
-}
-
 class GameOver extends Phaser.Scene {
   constructor() {
     super('GameOver');
@@ -461,16 +498,16 @@ class GameClear extends Phaser.Scene {
     let score = this.MainScene.score;
     if (score <= 0) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg1');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImgNormal');
     } else if (score == 1) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg1');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImgNormal');
     } else if (score == 2) {
       this.gameClearSoundNormal.play();
-      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg2');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImgNormal');
     } else if (score == 3) {
       this.gameClearSoundComplete.play();
-      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImg3');
+      this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImgComplete');
     }
     //
     this.add.text(120, height-150, "RESTART : SPACE KEY", {
