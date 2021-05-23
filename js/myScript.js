@@ -94,6 +94,14 @@ class FirstLoading extends Phaser.Scene {
   create() {
     this.selectSE = this.sound.add('selectSE');
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    // スマホ向け
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      this.input.on('pointerdown', ()=>{
+        this.selectSE.play();
+        this.scene.start('Title');
+      });
+    }
+    //
   }
   update() {
     if (this.spaceKey.isDown && this.isLoadCompleted) {
@@ -123,8 +131,8 @@ class Title extends Phaser.Scene {
     this.logoDirection = "down";
     this.upSpeed = 0.25;
     this.downSpeed = 0.25;
-    this.topLimit = 470;
-    this.bottomLimit = 485;
+    this.topLimit = 465;
+    this.bottomLimit = 480;
     // BGM
     this.titleBGM = this.sound.add('titleBGM');
     let loopMaker = {
@@ -145,6 +153,15 @@ class Title extends Phaser.Scene {
       fill: '#8586fb',
       fontFamily: 'DotGothic16'
     })
+    // スマホ向けの処理
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      this.input.on('pointerdown', ()=>{
+        this.titleBGM.stop();
+        this.selectSE.play();
+        this.scene.start('Main');
+      });
+    }
+    //
   }
   update() {
     if (this.spaceKey.isDown) {
@@ -171,6 +188,10 @@ class Main extends Phaser.Scene {
     super('Main');
   }
   preload() {
+    // スマホ向けの処理
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      this.load.scenePlugin('rexgesturesplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexgesturesplugin.min.js', 'rexGestures', 'rexGestures');
+    }
   }
   create() {
     const stageHeight = 4000;
@@ -374,6 +395,40 @@ class Main extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.littleangels, collectStar, null, this);
     this.physics.add.overlap(this.player, this.enemies, gameOver, null, this);
     this.physics.add.overlap(this.player, this.goal, gameClear, null, this);
+    // スマホ向けの処理
+    // スマホ向けにスワイプでも動作するように。
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      var swipe = this.rexGestures.add.swipe(config);
+      swipe.on('swipe', function(swipe, gameObject, lastPointer){
+        if (this.player.body.touching.down) {
+          if (swipe.up) {
+            this.player.setVelocityY(-600);
+            //羽ばたき音再生
+            this.flyingSE.play('loop', {
+              delay: 0
+            });
+            this.player.anims.play('jump', true);
+          } else if (swipe.right) {
+            this.player.setVelocityX(400);
+            this.player.anims.play('rightwalk', true);
+            this.flyingSE.stop();
+          } else if (swipe.left) {
+            this.player.setVelocityX(-400);
+            this.player.anims.play('leftwalk', true);
+            this.flyingSE.stop();
+          }
+        } else {
+          if (swipe.right) {
+            this.player.setVelocityX(400);
+            this.player.anims.play('rightfly', true);
+          } else if (swipe.left) {
+            this.player.setVelocityX(-400);
+            this.player.anims.play('leftfly', true);
+          }
+        }
+      }, this);
+    }
+    //
   }
   update() {
     // 敵に関する処理
@@ -446,6 +501,15 @@ class GameOver extends Phaser.Scene {
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
     })
+    // スマホ向けの処理
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      this.input.on('pointerdown', ()=>{
+        this.gameOverSound.stop();
+        this.selectSE.play();
+        this.scene.start('Main');
+      });
+    }
+    //
   }
   update() {
     if (this.spaceKey.isDown) {
@@ -492,6 +556,16 @@ class GameClear extends Phaser.Scene {
       fill: '#000000',
       fontFamily: 'DotGothic16'
     })
+    // スマホ向けの処理
+    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+      this.input.on('pointerdown', ()=>{
+        this.gameClearSoundNormal.stop();
+        this.gameClearSoundComplete.stop();
+        this.selectSE.play();
+        this.scene.start('Main');
+      });
+    }
+    //
   }
   update() {
     if (this.spaceKey.isDown) {
