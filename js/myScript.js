@@ -121,10 +121,10 @@ class Title extends Phaser.Scene {
     this.logo = this.add.image(width/2, 470, 'logo');
     this.logo.scale = 0.55;
     this.logoDirection = "down";
-    this.upSpeed = 1;
-    this.downSpeed = 1.5;
+    this.upSpeed = 0.25;
+    this.downSpeed = 0.25;
     this.topLimit = 470;
-    this.bottomLimit = 535;
+    this.bottomLimit = 485;
     // BGM
     this.titleBGM = this.sound.add('titleBGM');
     let loopMaker = {
