@@ -56,16 +56,8 @@ class FirstLoading extends Phaser.Scene {
     // クリック時の効果音
     this.load.audio('selectSE', 'asset/sounds/select.mp3');
     // Title
-    this.load.image('title', 'asset/bg/title.png');
+    this.load.image('titleBG', 'asset/bg/title.png');
     this.load.image('logo', 'asset/bg/logo.png');
-    //
-        /*
-    this.load.spritesheet('titleBG', 'asset/bg/titlespritesheet.png', {
-      frameWidth: 828,
-      frameHeight: 1366
-    });
-        */
-    //
     this.load.audio('titleBGM', 'asset/sounds/titlebgm.mp3');
     // GameOver
     this.load.audio('gameOverSound', 'asset/sounds/gameover1.mp3');
@@ -121,31 +113,18 @@ class Title extends Phaser.Scene {
     const width = this.scale.width;
     const height = this.scale.height;
     //
-    this.add.image(width/2, height/2, 'title');
-    this.logo = this.add.image(width/2, 460, 'logo');
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.selectSE = this.sound.add('selectSE');
+    // タイトル背景
+    this.add.image(width/2, height/2, 'titleBG');
+    // ロゴ
+    this.logo = this.add.image(width/2, 470, 'logo');
     this.logo.scale = 0.55;
     this.logoDirection = "down";
     this.upSpeed = 1;
-    this.downSpeed = 1.4;
-    this.topLimit = 460;
+    this.downSpeed = 1.5;
+    this.topLimit = 470;
     this.bottomLimit = 535;
-    // sprite使うver
-    /*
-    this.titleBG = this.add.sprite(width/2, height/2, 'titleBG');
-    this.anims.create({
-      key: 'titleAnim',
-      frames: this.anims.generateFrameNumbers('titleBG', {
-        start: 0,
-        end: 7
-      }),
-      frameRate: 4,
-      repeat: -1
-    });
-    this.titleBG.anims.play('titleAnim', true);
-    */
-    //
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.selectSE = this.sound.add('selectSE');
     // BGM
     this.titleBGM = this.sound.add('titleBGM');
     let loopMaker = {
@@ -173,6 +152,7 @@ class Title extends Phaser.Scene {
       this.selectSE.play();
       this.scene.start('Main');
     }
+    // ロゴを動かす処理
     if (this.logo.y<this.topLimit) {
       this.logoDirection = "down";
     } else if (this.logo.y>this.bottomLimit) {
@@ -312,9 +292,8 @@ class Main extends Phaser.Scene {
     this.clouds.create(900, stageHeight-2600, 'cloud');
     this.clouds.create(300, stageHeight-2250, 'cloud');
     this.clouds.create(800, stageHeight-2000, 'cloud');
-    // 要検討@難易度調整: 1850ではすきまをプレイヤーが抜けられない
+    // 難易度調整ポイント: 1870を1850にすると、プレイヤーが雲のすきまを抜けられなくなる。
     this.clouds.create(50, stageHeight-1870, 'cloud');
-    //this.clouds.create(50, stageHeight-1850, 'cloud');
     this.clouds.create(300, stageHeight-1550, 'cloud');
     this.clouds.create(800, stageHeight-1350, 'cloud');
     this.clouds.create(50, stageHeight-1050, 'cloud');
@@ -375,8 +354,7 @@ class Main extends Phaser.Scene {
     this.enemies.children.entries.forEach(enemy => {
       enemy.body.setSize(100, 100, 1, 1);
       enemy.body.setBounce(Phaser.Math.FloatBetween(0.4, 0.8));
-      // 要検討@難易度調整: 敵がステージ外に消えていかなくなる
-      //enemy.body.setCollideWorldBounds(false);
+      // 難易度調整ポイント: falseにすると敵がステージ外に消えていく
       enemy.body.setCollideWorldBounds(true);
       enemy.anims.play('demonIdle', true);
       this.physics.add.collider(this.player, enemy);
@@ -402,10 +380,9 @@ class Main extends Phaser.Scene {
     this.enemies.children.entries.forEach(enemy => {
       // 敵とプレイヤーの距離を計算
       var distance = Math.sqrt(Math.pow(this.player.x-enemy.x, 2)+Math.pow(this.player.y-enemy.y, 2));
-      //console.log(distance, [[enemy.x, enemy.y], [this.player.x, this.player.y]]);
       // 閾値よりも近かった場合
       if (distance<=350) {
-        // 現時点のプレイヤーの座標にその敵を向かわせる。
+        // 現時点のプレイヤーの座標と同じ力をその敵にかける
         enemy.setVelocity(this.player.x/2, this.player.y/2);
       }
     });
@@ -428,7 +405,7 @@ class Main extends Phaser.Scene {
         this.player.anims.play('leftwalk', true);
         this.flyingSE.stop();
       } else {
-        // 要検討@難易度調整: これコメントアウトすると雲がつるつるになる。
+        // 難易度調整ポイント: 雲が滑るかどうか (コメントを外すと滑らなくなる)
         //this.player.setVelocityX(0);
         // 羽ばたき音停止
         this.flyingSE.stop();
