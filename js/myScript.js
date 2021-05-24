@@ -138,7 +138,7 @@ class Title extends Phaser.Scene {
     let loopMaker = {
       name: 'loop',
       start: 0,
-      duration: 22.7,
+      duration: 22.9,
       config: {
         loop: true
       }
@@ -289,7 +289,7 @@ class Main extends Phaser.Scene {
     let loopMaker = {
       name: 'loop',
       start: 0,
-      duration: 33.7,
+      duration: 33.85,
       config: {
         loop: true
       }
