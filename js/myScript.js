@@ -1,3 +1,20 @@
+let isSP = ()=>{
+  return window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints;
+}
+let titleNextWayName = ()=>{
+  if (isSP()) {
+    return "   TAP SCREEN!  ";
+  } else {
+    return "Press SPACE KEY!";
+  }
+}
+let restartWayName = ()=>{
+  if (isSP()) {
+    return "TAP SCREEN";
+  } else {
+    return "SPACE KEY";
+  }
+}
 class FirstLoading extends Phaser.Scene {
   //
   constructor() {
@@ -45,7 +62,7 @@ class FirstLoading extends Phaser.Scene {
         fill: '#ffffff',
         fontFamily: 'DotGothic16'
       });
-      _this.add.text(150, (height/6)*5, "NEXT : SPACE KEY", {
+      _this.add.text(150, (height/6)*5, "NEXT : "+restartWayName(), {
         fontSize: '64px',
         fill: '#ffffff',
         fontFamily: 'DotGothic16'
@@ -95,7 +112,7 @@ class FirstLoading extends Phaser.Scene {
     this.selectSE = this.sound.add('selectSE');
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     // スマホ向け
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       this.input.on('pointerdown', ()=>{
         this.selectSE.play();
         this.scene.start('Title');
@@ -129,6 +146,7 @@ class Title extends Phaser.Scene {
     this.logo = this.add.image(width/2, 470, 'logo');
     this.logo.scale = 0.55;
     this.logoDirection = "down";
+    // ↓ロゴの動く範囲、スピードの設定
     this.upSpeed = 0.25;
     this.downSpeed = 0.25;
     this.topLimit = 465;
@@ -148,13 +166,13 @@ class Title extends Phaser.Scene {
       delay: 0.5
     });
     //
-    this.add.text(150, (height/6)*5, "Press SPACE KEY!", {
+    this.add.text(150, (height/6)*5, titleNextWayName(), {
       fontSize: '64px',
       fill: '#8586fb',
       fontFamily: 'DotGothic16'
     })
     // スマホ向けの処理
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       this.input.on('pointerdown', ()=>{
         this.titleBGM.stop();
         this.selectSE.play();
@@ -189,7 +207,7 @@ class Main extends Phaser.Scene {
   }
   preload() {
     // スマホ向けの処理
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       this.load.scenePlugin('rexgesturesplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexgesturesplugin.min.js', 'rexGestures', 'rexGestures');
     }
   }
@@ -310,7 +328,11 @@ class Main extends Phaser.Scene {
     this.clouds.create(750, stageHeight-3400, 'cloud');
     this.clouds.create(10, stageHeight-3200, 'cloud');
     this.clouds.create(200, stageHeight-3000, 'cloud');
-    this.clouds.create(900, stageHeight-2600, 'cloud');
+    if(isSP()) {
+      this.clouds.create(880, stageHeight-2600, 'cloud');
+    } else {
+      this.clouds.create(900, stageHeight-2600, 'cloud');
+    }
     this.clouds.create(300, stageHeight-2250, 'cloud');
     this.clouds.create(800, stageHeight-2000, 'cloud');
     // 難易度調整ポイント: 1870を1850にすると、プレイヤーが雲のすきまを抜けられなくなる。
@@ -397,7 +419,7 @@ class Main extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.goal, gameClear, null, this);
     // スマホ向けの処理
     // スマホ向けにスワイプでも動作するように。
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       var swipe = this.rexGestures.add.swipe(config);
       swipe.on('swipe', function(swipe, gameObject, lastPointer){
         if (this.player.body.touching.down) {
@@ -496,13 +518,13 @@ class GameOver extends Phaser.Scene {
     //
     this.gameOverImg = this.add.image(width/2, height/2, 'gameOverImg');
     //
-    this.add.text(120, height-150, "RESTART : SPACE KEY", {
+    this.add.text(120, height-150, "RESTART : "+restartWayName(), {
       fontSize: '64px',
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
     })
     // スマホ向けの処理
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       this.input.on('pointerdown', ()=>{
         this.gameOverSound.stop();
         this.selectSE.play();
@@ -551,13 +573,13 @@ class GameClear extends Phaser.Scene {
       this.gameClearImg = this.add.image(width/2, height/2, 'gameClearImgComplete');
     }
     //
-    this.add.text(120, height-150, "RESTART : SPACE KEY", {
+    this.add.text(120, height-150, "RESTART : "+restartWayName(), {
       fontSize: '64px',
       fill: '#000000',
       fontFamily: 'DotGothic16'
     })
     // スマホ向けの処理
-    if( window.ontouchstart !== undefined && 0 < navigator.maxTouchPoints ) {
+    if(isSP()) {
       this.input.on('pointerdown', ()=>{
         this.gameClearSoundNormal.stop();
         this.gameClearSoundComplete.stop();
