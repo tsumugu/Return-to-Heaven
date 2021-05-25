@@ -171,21 +171,23 @@ class Title extends Phaser.Scene {
       fill: '#8586fb',
       fontFamily: 'DotGothic16'
     })
+    // 次に進む処理(スマホ・PC共通)
+    this.nextFunc = ()=>{
+      this.titleBGM.stop();
+      this.selectSE.play();
+      this.scene.start('Main');
+    }
     // スマホ向けの処理
     if(isSP()) {
       this.input.on('pointerdown', ()=>{
-        this.titleBGM.stop();
-        this.selectSE.play();
-        this.scene.start('Main');
+        this.nextFunc();
       });
     }
     //
   }
   update() {
     if (this.spaceKey.isDown) {
-      this.titleBGM.stop();
-      this.selectSE.play();
-      this.scene.start('Main');
+      this.nextFunc();
     }
     // ロゴを動かす処理
     if (this.logo.y<this.topLimit) {
@@ -417,7 +419,7 @@ class Main extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.littleangels, collectStar, null, this);
     this.physics.add.overlap(this.player, this.enemies, gameOver, null, this);
     this.physics.add.overlap(this.player, this.goal, gameClear, null, this);
-    // スマホ向けの処理
+    // スマホ向けの処理 (下のupdateの処理と一部重複。)
     // スマホ向けにスワイプでも動作するように。
     if(isSP()) {
       var swipe = this.rexGestures.add.swipe(config);
@@ -523,21 +525,24 @@ class GameOver extends Phaser.Scene {
       fill: '#ffffff',
       fontFamily: 'DotGothic16'
     })
+    // 次に進む処理(スマホ・PC共通)
+    this.nextFunc = ()=>{
+      this.gameOverSound.stop();
+      this.selectSE.play();
+      this.scene.start('Main');
+    }
     // スマホ向けの処理
     if(isSP()) {
       this.input.on('pointerdown', ()=>{
-        this.gameOverSound.stop();
-        this.selectSE.play();
-        this.scene.start('Main');
+        this.nextFunc();
       });
     }
     //
   }
   update() {
+    // PC向けの処理
     if (this.spaceKey.isDown) {
-      this.gameOverSound.stop();
-      this.selectSE.play();
-      this.scene.start('Main');
+      this.nextFunc();
     }
   }
 }
@@ -578,23 +583,25 @@ class GameClear extends Phaser.Scene {
       fill: '#000000',
       fontFamily: 'DotGothic16'
     })
+    // 次に進む処理(スマホ・PC共通)
+    this.nextFunc = ()=>{
+      this.gameClearSoundNormal.stop();
+      this.gameClearSoundComplete.stop();
+      this.selectSE.play();
+      this.scene.start('Main');
+    }
     // スマホ向けの処理
     if(isSP()) {
       this.input.on('pointerdown', ()=>{
-        this.gameClearSoundNormal.stop();
-        this.gameClearSoundComplete.stop();
-        this.selectSE.play();
-        this.scene.start('Main');
+        this.nextFunc();
       });
     }
     //
   }
   update() {
+    // PC向けの処理
     if (this.spaceKey.isDown) {
-      this.gameClearSoundNormal.stop();
-      this.gameClearSoundComplete.stop();
-      this.selectSE.play();
-      this.scene.start('Main');
+      this.nextFunc();
     }
   }
 }
